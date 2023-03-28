@@ -5,6 +5,7 @@ let products = [
     {name : '고구마', price : 7000},
     {name : '감자', price : 600},
     {name : '수박', price : 5000}
+
 ];
 
 function print(fruit){
@@ -27,3 +28,7 @@ for(const key in products){
 for(const item of products){
     console.log(item.name+"\t"+item.price);
 }
+
+products.forEach(element =>{
+    console.log(element.name + "\t" + element.price);
+});
