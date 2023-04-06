@@ -11,6 +11,7 @@ server.on('connection', function(socket){
 });
 
 server.on('request', function(req, res){
+    console.log("클라이언트 요청이 들어왔습니다.")
     console.log.dir(req);
 });
 
