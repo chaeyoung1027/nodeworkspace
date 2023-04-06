@@ -10,7 +10,7 @@ server.on('connection', function(socket){
     console.log('클라이언트가 접속했습니다. : %s, %d', addr.address, addr.port);
 });
 
-server.on('request', function(req, res)){
+server.on('request', function(req, res){
     console.log.dir(req);
-}
+});
 
