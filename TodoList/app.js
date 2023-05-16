@@ -26,16 +26,38 @@ app.get('/insert', (req, res) => {
 }) ;
 app.post('/insert', (req, res) => {
     console.log("/insert post 시작됨~");
-    //배열에 입력받은 값으로 객체를 만들어 추가
-    todosArr.push({contents:req.body.contents, yesno:req.body.yesno});
-}) ;
+    const newTodo = {
+        //배열에 입력받은 값으로 객체를 만들어 추가
+        id: todosArr.length === 0 ? 1 : todosArr[todosArr.length - 1].id + 1,
+        contents: req.body.contents,
+        yesno: req.body.yesno
+    };
+    todosArr.push(newTodo);
+    res.redirect('/');
+});
+//삭제
 app.get('/delete/:id', (req, res) => {
-    console.log("/delete "+ res.id);
-    // 추가
-    todosArr.splice(res.id,1);
-    console.log("delete ok~~~ " + res.id);
+    console.log("/delete "+ req.params.id);
+    todosArr = todosArr.filter(item => item.id !== parseInt(req.params.id));
+    console.log("delete ok~~~ " + req.params.id);
     res.redirect("/");
 });
+//수정
+app.get('/edit/:id', (req, res) => {
+    console.log("/edit get 시작됨~");
+    const id = Number(req.params.id); // id 값을 가져옵니다.
+    const todo = todosArr.find(todo => todo.id === id); // 해당 id 값을 가진 todo 객체를 찾습니다.
+    res.render('edit', {todo}); // 해당 todo 객체를 가지고 edit.ejs 화면에 출력합니다.
+});
+app.post('/edit/:id', (req, res) => {
+    console.log("/edit post 시작됨~");
+    const id = Number(req.params.id); // id 값을 가져옵니다.
+    const todoIndex = todosArr.findIndex(todo => todo.id === id); // 해당 id 값을 가진 todo 객체의 인덱스를 찾습니다.
+    todosArr[todoIndex].contents = req.body.contents; // 새로운 내용으로 수정합니다.
+    todosArr[todoIndex].yesno = req.body.yesno; // 새로운 완료 여부로 수정합니다.
+    res.redirect('/'); // 수정 후 목록 화면으로 이동합니다.
+});
+
 app.listen(3000, () => {
     console.log("3000포트 서버가 시작됨~~");
 });
