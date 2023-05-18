@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
     res.render('list', {datalist: todosArr});   // list.ejs 화면에 출력
 });
 app.get('/insert', (req, res) => {
-    console.log("/insert get 시작됨~");
+    console.log("추가됨!");
     res.render('insert');
 }) ;
 app.post('/insert', (req, res) => {
