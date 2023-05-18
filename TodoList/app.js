@@ -2,62 +2,83 @@ let express = require('express');
 let ejs = require('ejs');
 let path = require('path');
 
-let todosArr = [
-    {id:1, contents: '영화보기', yesno: 'no'},
-    {id:2, contents: '숙제하기', yesno: 'no'},
-    {id:3, contents: '운동하기', yesno: 'no'},
-    {id:4, contents: '노래듣기', yesno: 'no'}
-];  // 빈배열
+let todoArr = [
+    { id: 1, contents: '영화 보기', yesno: 'no' },
+    { id: 2, contents: '숙제 하기', yesno: 'no' },
+    { id: 3, contents: '운동 하기', yesno: 'no' },
+    { id: 4, contents: '노래 듣기', yesno: 'no' }
+];
+
+let count = 5;
 
 let app = express();
 
 app.use(express.static('public'));  // pulbic 폴더 공유
-app.use(express.urlencoded({extended:false}));  // 사용자 html 입력
-app.set('views', path.join(__dirname, 'views'));    // 뷰폴더
+app.use(express.urlencoded({ extended: false }));  // 사용자 html 입력
+app.set('views', path.join(__dirname, 'views'));    // 뷰 폴더
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
     console.log('/ get이 시작됨~~');
-    res.render('list', {datalist: todosArr});   // list.ejs 화면에 출력
-});
-app.get('/insert', (req, res) => {
-    console.log("추가됨!");
-    res.render('insert');
-}) ;
-app.post('/insert', (req, res) => {
-    console.log("/insert post 시작됨~");
-    const newTodo = {
-        //배열에 입력받은 값으로 객체를 만들어 추가
-        id: todosArr.length === 0 ? 1 : todosArr[todosArr.length - 1].id + 1,
-        contents: req.body.contents,
-        yesno: req.body.yesno
-    };
-    todosArr.push(newTodo);
-    res.redirect('/');
-});
-//삭제
-app.get('/delete/:id', (req, res) => {
-    console.log("/delete "+ req.params.id);
-    todosArr = todosArr.filter(item => item.id !== parseInt(req.params.id));
-    console.log("delete ok~~~ " + req.params.id);
-    res.redirect("/");
-});
-//수정
-app.get('/edit/:id', (req, res) => {
-    console.log("/edit get 시작됨~");
-    const id = Number(req.params.id); // id 값을 가져옵니다.
-    const todo = todosArr.find(todo => todo.id === id); // 해당 id 값을 가진 todo 객체를 찾습니다.
-    res.render('edit', {todo}); // 해당 todo 객체를 가지고 edit.ejs 화면에 출력합니다.
-});
-app.post('/edit/:id', (req, res) => {
-    console.log("/edit post 시작됨~");
-    const id = Number(req.params.id); // id 값을 가져옵니다.
-    const todoIndex = todosArr.findIndex(todo => todo.id === id); // 해당 id 값을 가진 todo 객체의 인덱스를 찾습니다.
-    todosArr[todoIndex].contents = req.body.contents; // 새로운 내용으로 수정합니다.
-    todosArr[todoIndex].yesno = req.body.yesno; // 새로운 완료 여부로 수정합니다.
-    res.redirect('/'); // 수정 후 목록 화면으로 이동합니다.
+    res.render('list', { datalist: todoArr });   // list.ejs 화면에 출력
 });
 
+app.get('/insert', (req, res) => {
+    console.log("/insert get 시작됨~");
+    res.render('insert');
+});
+
+app.post('/insert', (req, res) => {
+    console.log("/insert post 시작됨~");
+    //배열에 입력 받은 값으로 객체를 만들어 추가
+    let id_num = count++;
+    todoArr.push({id:id_num, contents:req.body.contents, yesno: req.body.yesno});
+    res.redirect("/");
+});
+
+app.get('/delete/:id', (req, res) => {
+    console.log("/delete " + res.id);
+    for(const i in todoArr) {
+        if(todoArr[i].id == req.params.id) {
+            console.log(todoArr[i].id + " " + i);
+            todoArr.splice(i, 1);
+        }
+    }
+    console.log("delete ok~~~ " + todoArr);
+    res.redirect("/");
+});
+
+app.get('/edit/:id', (req, res) => {
+    let editdata = [];
+    console.log("/edit " + req.params.id);
+    for(const i in todoArr) {
+        if(todoArr[i].id == req.params.id) {
+            console.log(todoArr[i].id + " " + i);
+            editdata = todoArr[i];
+            res.render('edit', {data: editdata}); //edit.ejs
+        }
+    }
+})
+
+app.post('/edit/:id',(req, res) => {
+    let editdata = [];
+    console.log("/edit " + req.params.id);
+    if(req.body.contents && req.body.yesno) {
+        console.log("수정 값 " + req.body.contents + " " + req.body.yesno);
+    }
+
+    //추가
+    for (const i in todoArr) {
+        if(todoArr[i].id == req.params.id) {
+            todoArr.splice(i, 1, {id:req.params.id, contents:req.body.contents, yesno:req.body.yesno});
+            console.log("수정 ok" + req.params.id);
+        }
+    }
+    res.redirect("/");
+
+
+})
+
 app.listen(3000, () => {
-    console.log("3000포트 서버가 시작됨~~");
+    console.log("3000포트 서버가 시작됨");
 });
